@@ -37,14 +37,13 @@ class RAM:
         # Перемешиваем данные
         X, y = shuffle(X, y, random_state=cnn.num_classes)
 
-        # Разбиваем на обучающий и тестовый наборы
         X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.1)
 
         # Преобразуем в тензоры
         X_test = tf.convert_to_tensor(X_test, dtype=tf.float32)
         y_test = tf.convert_to_tensor(y_test, dtype=tf.float32)
 
-        # Печатаем форму данных для проверки
+        # Форма для проверки
         print(f"Train shape: {X_train.shape}, {y_train.shape}")
         print(f"Test shape: {X_test.shape}, {y_test.shape}")
 
@@ -60,7 +59,7 @@ class RAM:
         self.X, self.y = shuffle(X, y, random_state=cnn.num_classes)
 
         # Преобразуем в тензоры
-        X = tf.convert_to_tensor(self.X, dtype=tf.float32)
+        self.X = tf.convert_to_tensor(self.X, dtype=tf.float32)
         self.y = tf.convert_to_tensor(self.y, dtype=tf.float32)
 
 
@@ -86,11 +85,6 @@ class RAM:
                 callbacks=[early_stopping, checkpoint]
             )
 
-        print("Обучение завершено.")
-        print(f"Эпохи: {len(history.history['loss'])}/{history.params['epochs']}")
-        print("Финальные метрики:")
-        print(f"Тренировочная потеря: {history.history['loss'][-1]}")
-        print(f"Валидационная потеря: {history.history['val_loss'][-1]}")
 
         hist = history.history
         x_arr = np.arange(len(hist['loss']))+1
