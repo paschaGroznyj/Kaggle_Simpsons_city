@@ -84,7 +84,7 @@ class Preprocess:
             print(f"Сохранены данные для класса {label}: {images.shape}, {labels.shape}")
 
 
-    def make_dataset_ROM(self):
+    def make_dataset_ROM(self): # Не эффективно
         # Средние значение ширины и высоты 416 и 409
         target_height, target_width = 224, 224
 
@@ -128,15 +128,10 @@ class Preprocess:
         for i in range(5):
             img = np.load(f"output_dir/{label}_{i}_images.npy")
             img = np.concatenate(img, axis=0)
-            if isinstance(img, tf.Tensor):  # Если изображение - тензор TensorFlow
-                img = img.numpy()  # Преобразуем его в NumPy массив
-
-                # Преобразуем диапазон значений [0, 1] в [0, 255]
             img = (img * 255).astype(np.uint8)
 
-            # Отобразим изображение с помощью OpenCV
             cv2.imshow("Image", img)
-            cv2.waitKey(500)  # Задержка в 1000 мс (1 секунда)
+            cv2.waitKey(500)
             cv2.destroyAllWindows()
 
 
