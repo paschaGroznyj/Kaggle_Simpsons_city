@@ -1,12 +1,14 @@
 import tensorflow as tf
-from tensorflow.keras.callbacks import EarlyStopping # Ранний останов обучения, если точность валидации падает
-from tensorflow.keras.callbacks import ModelCheckpoint
-from tensorflow.keras.utils import to_categorical
+# from tensorflow.keras.callbacks import EarlyStopping # Ранний останов обучения, если точность валидации падает
+# from tensorflow.keras.callbacks import ModelCheckpoint
+# from tensorflow.keras.utils import to_categorical
+from tf_keras.callbacks import EarlyStopping, ModelCheckpoint # Ранний останов обучения, если точность валидации падает
+from tf_keras.utils import to_categorical
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
-from CNN_Model import Model
+from layers_model import Model
 import os
 
 cnn = Model()
@@ -21,9 +23,9 @@ class RAM:
         with tf.device('/CPU:0'):
             for file in os.listdir("dataset_npy"):
                 if "images" in file:
-                    images.append(np.load("output_dir_RAM/" + file))
+                    images.append(np.load("dataset_npy/" + file))
                 elif "labels" in file:
-                    labels.append(np.load("output_dir_RAM/" + file))
+                    labels.append(np.load("dataset_npy/" + file))
 
             images = np.concatenate(images, axis=0)
             labels = np.concatenate(labels, axis=0)
@@ -37,13 +39,13 @@ class RAM:
         # Перемешиваем данные
         X, y = shuffle(X, y, random_state=cnn.num_classes)
 
+        # Для раннего тестирования
         X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.1)
 
-        # Преобразуем в тензоры
-        X_test = tf.convert_to_tensor(X_test, dtype=tf.float32)
-        y_test = tf.convert_to_tensor(y_test, dtype=tf.float32)
+        X_test = tf.convert_to_tensor(X_test, dtype=tf.float16)
+        y_test = tf.convert_to_tensor(y_test, dtype=tf.float16)
 
-        # Форма для проверки
+        # Печатаем форму данных для проверки
         print(f"Train shape: {X_train.shape}, {y_train.shape}")
         print(f"Test shape: {X_test.shape}, {y_test.shape}")
 
@@ -52,39 +54,37 @@ class RAM:
 
     def data_preparation_for_train(self):
         X, y = self.load_data()  # Подгружаем изображения
-
         y = to_categorical(y, num_classes=cnn.num_classes)
         print(f"Shape of y: {y.shape}")  # (samples, num_classes)
         # Перемешиваем данные
         self.X, self.y = shuffle(X, y, random_state=cnn.num_classes)
 
         # Преобразуем в тензоры
-        self.X = tf.convert_to_tensor(self.X, dtype=tf.float32)
-        self.y = tf.convert_to_tensor(self.y, dtype=tf.float32)
+        self.X = tf.convert_to_tensor(self.X, dtype=tf.float16)
+        self.y = tf.convert_to_tensor(self.y, dtype=tf.float16)
 
 
     def train_model(self):
 
         self.data_preparation_for_train()
-        # Определяем коллбэки
+        # Определяем чекпоинты
         with tf.device('/GPU:0'):
-            early_stopping = EarlyStopping(monitor='val_loss', patience=2, restore_best_weights=True)
+            early_stopping = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
             checkpoint = ModelCheckpoint(
-                f'best_city_simpsons_{cnn.num_classes}_.keras',  # Имя файла для сохранения
+                f'keras_models/best_city_simpsons_{cnn.num_classes}.keras',  # Имя файла для сохранения
                 monitor='val_loss',
                 save_best_only=True,
                 mode='min',
                 verbose=1
             )
-            # Обучаем модель с использованием коллбэков
+            # Обучаем модель с использованием чекпоинтов
             history = model.fit(
                 self.X, self.y,
-                epochs=13,
+                epochs=15,
                 validation_split=0.2,
                 batch_size=cnn.batch_size,
                 callbacks=[early_stopping, checkpoint]
             )
-
 
         hist = history.history
         x_arr = np.arange(len(hist['loss']))+1

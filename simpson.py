@@ -9,12 +9,14 @@ print(tf.config.list_physical_devices('GPU'))
 class Preprocess:
 
     def __init__(self):
-        path_windows = "C:/Users/.../journey-springfield/train/simpsons_dataset"
+        path_windows = "C:/.../journey-springfield/train/simpsons_dataset"
         path_linux = "/mnt/c/.../journey-springfield/train/simpsons_dataset"
-        self.path_train = path_linux
+
+        self.path_train = path_windows
         self.labels = os.listdir(self.path_train)
         self.dataset = []
-        self.labels = self.labels[:20] # Редактируем количество классов
+        self.dict_classes = {'abraham_grampa_simpson': 913, 'agnes_skinner': 42, 'apu_nahasapeemapetilon': 623, 'barney_gumble': 106, 'bart_simpson': 1342, 'carl_carlson': 98, 'charles_montgomery_burns': 1193, 'chief_wiggum': 986, 'cletus_spuckler': 47, 'comic_book_guy': 469, 'disco_stu': 8, 'edna_krabappel': 457, 'fat_tony': 27, 'gil': 27, 'groundskeeper_willie': 121, 'homer_simpson': 2246, 'kent_brockman': 498, 'krusty_the_clown': 1206, 'lenny_leonard': 310, 'lionel_hutz': 3, 'lisa_simpson': 1354, 'maggie_simpson': 128, 'marge_simpson': 1291, 'martin_prince': 71, 'mayor_quimby': 246, 'milhouse_van_houten': 1079, 'miss_hoover': 17, 'moe_szyslak': 1452, 'ned_flanders': 1454, 'nelson_muntz': 358, 'otto_mann': 32, 'patty_bouvier': 72, 'principal_skinner': 1194, 'professor_john_frink': 65, 'rainier_wolfcastle': 45, 'ralph_wiggum': 89, 'selma_bouvier': 103, 'sideshow_bob': 877, 'sideshow_mel': 40, 'snake_jailbird': 55, 'troy_mcclure': 8, 'waylon_smithers': 181}
+        self.labels = self.labels # Редактируем количество классов
         self.abraham = os.listdir(self.path_train + "/" + self.labels[0])
         self.class_to_index = {label: idx for idx, label in enumerate(self.labels)}
         self.value_img = 300 # Количество изображений на класс. Ограничение видеопамяти 4Гб, одна картинка 602 Кб
@@ -29,7 +31,7 @@ class Preprocess:
         height, width = img.shape[:2]
 
         # Фильтрация по размеру
-        if not (250 < height < 600 and 250 < width < 600):
+        if not (100 < height < 800 and 100 < width < 800):
             return None
         if random_:
             img = tf.image.random_brightness(img, max_delta=0.2) # Случайное изменение яркости
@@ -75,8 +77,8 @@ class Preprocess:
                     if len(labels) == self.value_img:
                         break
 
-            images = np.array(images, dtype=np.float32)
-            labels = np.array(labels, dtype=np.int32)
+            images = np.array(images, dtype=np.float16)
+            labels = np.array(labels, dtype=np.int16)
             print(f"Class {label}: Processed {len(images)} images")
 
             np.save(os.path.join(f"dataset_npy/{label}_images.npy"), images)
@@ -84,7 +86,7 @@ class Preprocess:
             print(f"Сохранены данные для класса {label}: {images.shape}, {labels.shape}")
 
 
-    def make_dataset_ROM(self): # Не эффективно
+    def make_dataset_pieces(self): # Не эффективно
         # Средние значение ширины и высоты 416 и 409
         target_height, target_width = 224, 224
 
@@ -111,8 +113,8 @@ class Preprocess:
                     if len(labels) == self.value_img:
                         break
 
-            images = np.array(images, dtype=np.float32)
-            labels = np.array(labels, dtype=np.int32)
+            images = np.array(images, dtype=np.float16)
+            labels = np.array(labels, dtype=np.int16)
             print(f"Class {label}: Processed {len(images)} images")
             for i in range(self.n):
                 start = i * self.step
@@ -123,7 +125,7 @@ class Preprocess:
 
 
 
-    def cv2_view(self):
+    def cv2_view(self): # Предпросмотр
         label = 'abraham_grampa_simpson'
         for i in range(5):
             img = np.load(f"output_dir/{label}_{i}_images.npy")
