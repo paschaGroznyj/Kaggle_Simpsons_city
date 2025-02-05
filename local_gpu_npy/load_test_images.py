@@ -10,7 +10,7 @@ rename_classes = {0: 'abraham_grampa_simpson', 1: 'agnes_skinner', 2: 'apu_nahas
 # path = "/mnt/c/.../journey-springfield/testset/testset"
 path = "C:/.../journey-springfield/testset/testset"
 name_dict = {name: 1 for name in os.listdir(path)}
-model = load_model('keras_models/best_city_simpsons_42_300_image.keras')
+model = load_model('../keras_models/best_city_simpsons_42_300_image.keras')
 def preprocess_image(image_path, target_height, target_width):
     # Загрузка изображения
     img_raw = tf.io.read_file(image_path)

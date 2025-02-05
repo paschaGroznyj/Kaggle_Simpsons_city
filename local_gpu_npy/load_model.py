@@ -1,5 +1,5 @@
 from tensorflow.keras.models import load_model
-from train_model import RAM
+from Kaggle_Simpsons_city.local_gpu_npy.train_model import RAM
 from CNN_Model import Model
 
 

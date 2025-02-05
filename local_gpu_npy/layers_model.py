@@ -18,9 +18,8 @@ if gpus:
 
 from tensorflow.keras.models import Sequential # Linux
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Dropout, GlobalMaxPooling2D, BatchNormalization, Flatten
-from tensorflow.keras.regularizers import l2
-from simpson import Preprocess
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense, Dropout, GlobalMaxPooling2D
+from Kaggle_Simpsons_city.local_gpu_npy.simpson import Preprocess
 
 # from tf_keras.models import Sequential # Для Windows
 # from tf_keras.optimizers import Adam

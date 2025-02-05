@@ -21,7 +21,7 @@ class RAM:
         images = []
         labels = []
         with tf.device('/CPU:0'):
-            for file in os.listdir("dataset_npy"):
+            for file in os.listdir("../dataset_npy"):
                 if "images" in file:
                     images.append(np.load("dataset_npy/" + file))
                 elif "labels" in file:
